@@ -4,7 +4,8 @@
   "description": "A Typescript POC message processing service",
   "main": "index.js",
   "scripts": {
-    "bootstrap": "lerna bootstrap"
+    "bootstrap": "lerna bootstrap",
+    "server:dev": "cd src/server && npm run start:dev"
   },
   "author": "Gil Reich",
   "license": "ISC",
