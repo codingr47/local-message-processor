@@ -1,0 +1,11 @@
+{
+    "name": "@localmessageprocessor/interfaces",
+    "version": "0.0.1",
+    "private": true,
+    "main": "./lib/index.ts",
+    "dependencies": {},
+    "devDependencies": {
+        "typescript": "^5.1.3"
+    }
+}
+  
