@@ -1,7 +1,15 @@
 {
+    "version": "0.0.1",
+    "command": {
+        "bootstrap": {
+            "hoist": true,
+            "rejectCycles": true
+        }
+    },
     "packages": [
         "src/client",
         "src/message_processor",
-        "src/server"
+        "src/server",
+        "src/interfaces"
     ]
 }
