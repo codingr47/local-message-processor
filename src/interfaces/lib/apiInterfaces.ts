@@ -4,10 +4,18 @@ export enum EventName {
     SubstractRevenue = "substract_revenue"
 };
 
-export type LiveEventRequestInput = {
+export interface LiveEventRequestInput {
     userId: string;
     name: EventName;
     value: number;
 };
 
-export type LiveEventRequestOutput = {};
+export interface LiveEventRequestOutput {};
+
+export interface UserEventRequestInput {
+    userId: string;
+}
+
+export interface UserEventRequestOutput {
+    revenue: number;
+}
