@@ -1,1 +1,1 @@
-export * from "./apiInterfaces";
+export type * from "./apiInterfaces";
