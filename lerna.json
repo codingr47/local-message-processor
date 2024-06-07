@@ -1,0 +1,7 @@
+{
+    "packages": [
+        "src/client",
+        "src/message_processor",
+        "src/server"
+    ]
+}
