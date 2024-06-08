@@ -13,7 +13,6 @@ export class AppController {
   @Post("/liveEvent")
   @UsePipes(new ValidationPipe({ transform: true }))
   liveEvent(@Body() event: CreateLiveEventRequest): Promise<LiveEventRequestOutput> {
-    console.log(event);
     return this.appService.insertLiveEvent(event);
   }
   
