@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "axios": "^1.7.2",
+    "axios-retry": "^4.4.0",
     "@localmessageprocessor/interfaces": "^0.0.1"
   },
   "devDependencies": {

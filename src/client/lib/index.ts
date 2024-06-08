@@ -1,4 +1,5 @@
 import axios from "axios"
+import axiosRetry from "axios-retry";
 import { 
     LiveEventRequestInput,
     LiveEventRequestOutput,
@@ -19,6 +20,9 @@ export default function eventsApi(baseUrl: string, token: string) {
             Authorization: token,
         },
     });
+    axiosRetry(client, { retries: 10, retryDelay: (retryCount) => {
+        return retryCount * 1000;
+    }});
     return {
         liveEvent(input: LiveEventRequestInput): Promise<AxiosResponse<LiveEventRequestOutput>> {
             return client.post<LiveEventRequestInput, AxiosResponse<LiveEventRequestOutput>>(Routes.LiveEvent, input);
