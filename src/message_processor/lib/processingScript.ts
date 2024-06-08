@@ -3,6 +3,15 @@ import { readFile, writeFile } from "fs-extra";
 import { LiveEventRequestInput, EventName } from "@localmessageprocessor/interfaces";
 import { Sequelize } from "sequelize-typescript";
 import "dotenv/config";
+import yargs from "yargs";
+
+const SLEEP_MS = 500;
+
+const sleep = (ms: number) =>  {
+    return new Promise<void>((res) => {
+        setTimeout(() => { res(); }, ms);
+    });
+}
 
 const sequelize = new Sequelize({
     dialect: "postgres",
@@ -66,15 +75,37 @@ const getRevenuesArray = (messages: LiveEventRequestInput[]): [string, number][]
     return Array.from(map);
 }
 
+
+const forever = async (cb: () => Promise<void>) => {
+    while (true) {
+        await cb();
+        await sleep(SLEEP_MS);
+    }
+}
+
 (async() => {
-    let messagesQueue: LiveEventRequestInput[] = [];
-    const eventsFilePath = process.env.EVENTS_FILE;
-    const stream = createReadStream(eventsFilePath);
-    const { events, charactersRead } = await processMessages(stream);
-    const revenuesArray = await getRevenuesArray(events);
-    await Promise.all(revenuesArray.map(([userId, revenue]) => { 
-        sequelize.query(getUpsertQuery(userId, revenue));
-    }));
-    const fileContents = await readFile(eventsFilePath, { encoding: "utf-8" });
-    await writeFile(eventsFilePath, fileContents.substring(charactersRead), { encoding: "utf-8" });
+    const main = async () => {
+        const eventsFilePath = process.env.EVENTS_FILE;
+        const stream = createReadStream(eventsFilePath);
+        const { events, charactersRead } = await processMessages(stream);
+        const revenuesArray = await getRevenuesArray(events);
+        await Promise.all(revenuesArray.map(([userId, revenue]) => { 
+            sequelize.query(getUpsertQuery(userId, revenue));
+        }));
+        const fileContents = await readFile(eventsFilePath, { encoding: "utf-8" });
+        await writeFile(eventsFilePath, fileContents.substring(charactersRead), { encoding: "utf-8" });
+    }
+    const args =  
+    await yargs(process.argv)
+        .option("forever", {
+            demandOption: false,
+            type: "boolean",
+        })
+        .parse();
+    if (args.forever) {
+        await forever(main);
+    } else {
+        await main();
+    }
+    
 })();

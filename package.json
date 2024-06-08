@@ -7,8 +7,10 @@
     "bootstrap": "lerna bootstrap",
     "server:dev": "cd src/server && npm run start:dev",
     "process:dev": "cd src/message_processor && npm run process",
+    "process:dev-forever": "cd src/message_processor && npm run process -- --forever=true",
     "test:client-server": "cd src/tests/ && npm run test:client-server",
-    "test:client-server-processor": "cd src/tests/ && npm run test:client-server-processor"
+    "test:client-server-processor": "cd src/tests/ && npm run test:client-server-processor",
+    "test:client-server-processor-parallel": "cd src/tests/ && npm run test:client-server-processor-parallel"
   },
   "author": "Gil Reich",
   "license": "ISC",
