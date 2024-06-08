@@ -15,6 +15,7 @@ export class FileSystemService implements OnModuleInit  {
         return new Promise((resolve, reject) => { 
             this.writeStream.write(JSON.stringify(obj) + "\n", (err) => { 
                 if(err) {
+                    console.log(err);
                     reject(err);
                 } else {
                     resolve();

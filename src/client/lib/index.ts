@@ -5,6 +5,7 @@ import {
     UserEventRequestInput,
     UserEventRequestOutput,
 } from "@localmessageprocessor/interfaces";
+import { AxiosResponse } from "axios";
 
 enum Routes {
     LiveEvent = "/liveEvent",
@@ -17,14 +18,14 @@ export default function eventsApi(baseUrl: string, token: string) {
         headers: {
             Authorization: token,
         },
-    })
+    });
     return {
-        liveEvent(input: LiveEventRequestInput): Promise<LiveEventRequestOutput> {
-            return client.post<LiveEventRequestInput, LiveEventRequestOutput>(Routes.LiveEvent, input);
+        liveEvent(input: LiveEventRequestInput): Promise<AxiosResponse<LiveEventRequestOutput>> {
+            return client.post<LiveEventRequestInput, AxiosResponse<LiveEventRequestOutput>>(Routes.LiveEvent, input);
         },
-        userEvents(input: UserEventRequestInput): Promise<UserEventRequestOutput> {
+        userEvents(input: UserEventRequestInput): Promise<AxiosResponse<UserEventRequestOutput>> {
             const route = Routes.UserEvents.replace(":userId", input.userId);
-            return client.get<UserEventRequestInput, UserEventRequestOutput>(route);
+            return client.get<UserEventRequestInput, AxiosResponse<UserEventRequestOutput>>(route);
         }
     }
 }

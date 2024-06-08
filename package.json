@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "bootstrap": "lerna bootstrap",
-    "server:dev": "cd src/server && npm run start:dev"
+    "server:dev": "cd src/server && npm run start:dev",
+    "process:dev": "cd src/message_processor && npm run process",
+    "test:client-server": "cd src/tests/ && npm run test:client-server"
   },
   "author": "Gil Reich",
   "license": "ISC",

@@ -1,8 +1,5 @@
 
-export enum EventName {
-    AddRevenue = "add_revenue",
-    SubstractRevenue = "substract_revenue",
-};
+export type EventName = "add_revenue" | "substract_revenue";
 
 
 export interface LiveEventRequestInput {
