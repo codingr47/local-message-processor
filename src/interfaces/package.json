@@ -3,6 +3,7 @@
     "version": "0.0.1",
     "private": true,
     "main": "./lib/index.ts",
+    "type": "commonjs",
     "devDependencies": {
         "typescript": "^5.1.3"
     }

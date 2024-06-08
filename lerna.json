@@ -10,6 +10,7 @@
         "src/client",
         "src/message_processor",
         "src/server",
-        "src/interfaces"
+        "src/interfaces",
+        "src/tests"
     ]
 }

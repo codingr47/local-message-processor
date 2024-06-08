@@ -4,9 +4,12 @@ import {
     LiveEventRequestOutput,
     UserEventRequestInput,
     UserEventRequestOutput,
-    Routes,
 } from "@localmessageprocessor/interfaces";
 
+enum Routes {
+    LiveEvent = "/liveEvent",
+    UserEvents = "/userEvents/:userId",
+};
 
 export default function eventsApi(baseUrl: string, token: string) {   
     const client = axios.create({

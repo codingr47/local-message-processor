@@ -1,8 +1,9 @@
 
 export enum EventName {
     AddRevenue = "add_revenue",
-    SubstractRevenue = "substract_revenue"
+    SubstractRevenue = "substract_revenue",
 };
+
 
 export interface LiveEventRequestInput {
     userId: string;
@@ -14,13 +15,8 @@ export interface LiveEventRequestOutput {};
 
 export interface UserEventRequestInput {
     userId: string;
-}
+};
 
 export interface UserEventRequestOutput {
     revenue: number;
-}
-
-export enum Routes {
-    LiveEvent = "/liveEvent",
-    UserEvents = "/userEvents/:userId"
-}
+};

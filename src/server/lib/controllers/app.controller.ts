@@ -6,17 +6,22 @@ import { UserEventRequestOutput, LiveEventRequestOutput } from "@localmessagepro
 import { CreateLiveEventRequest } from './dto/createLiveEventRequest';
 import { GetUserEventRequest } from './dto/getUserEventRequest';
 
+enum Routes {
+  LiveEvent = "/liveEvent",
+  UserEvents = "/userEvents/:userId",
+};
+
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Post("/liveEvent")
+  @Post(Routes.LiveEvent)
   @UsePipes(new ValidationPipe({ transform: true }))
   liveEvent(@Body() event: CreateLiveEventRequest): Promise<LiveEventRequestOutput> {
     return this.appService.insertLiveEvent(event);
   }
   
-  @Get("/userEvents/:userId") 
+  @Get(Routes.UserEvents) 
   @UsePipes(new ValidationPipe({ transform: true }))
   userEvent(@Param() params: GetUserEventRequest): Promise<UserEventRequestOutput> {
     return this.appService.getUserEvent(params)
