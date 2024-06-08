@@ -1,6 +1,6 @@
 import { Controller, Get, Body, Param, UsePipes } from '@nestjs/common/decorators';
 import { ValidationPipe } from "@nestjs/common";
-import { AppService } from './app.service';
+import { AppService } from '../services/app.service';
 import { Post } from '@nestjs/common';
 import { UserEventRequestOutput, LiveEventRequestOutput } from "@localmessageprocessor/interfaces";
 import { CreateLiveEventRequest } from './dto/createLiveEventRequest';
