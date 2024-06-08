@@ -19,3 +19,8 @@ export interface UserEventRequestInput {
 export interface UserEventRequestOutput {
     revenue: number;
 }
+
+export enum Routes {
+    LiveEvent = "/liveEvent",
+    UserEvents = "/userEvents/:userId"
+}
