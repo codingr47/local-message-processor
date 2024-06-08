@@ -7,7 +7,8 @@ export class FileSystemService implements OnModuleInit  {
     private writeStream: WriteStream | undefined;
 
     onModuleInit() {
-        this.writeStream = createWriteStream(process.env.EVENTS_FILE);
+        
+        this.writeStream = createWriteStream(process.env.EVENTS_FILE, { flags: "a" });
     }
 
     public writeObject(obj: Record<string, any>): Promise<void> {

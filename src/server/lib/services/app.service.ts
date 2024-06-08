@@ -1,10 +1,13 @@
 import { LiveEventRequestInput, LiveEventRequestOutput, UserEventRequestInput, UserEventRequestOutput } from '@localmessageprocessor/interfaces';
 import { Injectable } from '@nestjs/common';
+import { FileSystemService } from './fs.service';
 
 @Injectable()
 export class AppService {
-  insertLiveEvent({ name, userId, value }: LiveEventRequestInput): Promise<LiveEventRequestOutput> {
-    return Promise.resolve({});
+  constructor(private fsService: FileSystemService) {}
+
+  insertLiveEvent(event: LiveEventRequestInput): Promise<LiveEventRequestOutput> { 
+    return this.fsService.writeObject(event).then(() => ({}));
   }
 
   getUserEvent({ userId }: UserEventRequestInput): Promise<UserEventRequestOutput> {
