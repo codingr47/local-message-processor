@@ -5,6 +5,7 @@
     "main": "lib/index.ts",
     "scripts": {
         "test:client-server": "jest lib/client-server-send.test.ts --verbose",
+        "test:client-server-processor": "jest lib/client-server-send-processed.test.ts --verbose",
         "bla": "ts-node bla.ts"
     },
     "devDependencies": {
