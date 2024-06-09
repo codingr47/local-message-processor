@@ -6,8 +6,7 @@
     "scripts": {
         "test:client-server": "jest lib/client-server-send.test.ts --verbose",
         "test:client-server-processor": "jest lib/client-server-send-processed.test.ts --verbose",
-        "test:client-server-processor-parallel": "jest lib/client-server-send-processed-parallel.test.ts --verbose",
-        "bla": "ts-node bla.ts"
+        "test:client-server-processor-parallel": "jest lib/client-server-send-processed-parallel.test.ts --verbose"
     },
     "devDependencies": {
       "@types/jest": "^29.5.2",

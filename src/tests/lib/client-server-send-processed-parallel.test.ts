@@ -37,7 +37,7 @@ describe("Load test", () => {
         }
         await sleep(5000);
         console.log("Starting load test !");
-        spawn("npm", ["run", "process:dev-forever"], { cwd: path.resolve(__dirname, "../../"), stdio: "inherit", shell: true});
+        //spawn("npm", ["run", "process:dev-forever"], { cwd: path.resolve(__dirname, "../../"), stdio: "inherit", shell: true});
         const errors: Error[] = [];
         const throttle = throttledQueue(1000, 1000);
         const expectedUserValues = new Map<string, number[]>();

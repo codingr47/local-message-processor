@@ -7,9 +7,9 @@ import UsersRevenue from 'lib/entities/usersRevenue.entity';
 export class AppService {
   constructor(private fsService: FileSystemService, @Inject("USERS_REVENUE_REPOSITORY") private usersRevenueRepository: typeof UsersRevenue) {}
 
-
-  insertLiveEvent(event: LiveEventRequestInput): Promise<LiveEventRequestOutput> { 
-    return this.fsService.writeObject(event).then(() => ({}));
+  async insertLiveEvent(event: LiveEventRequestInput): Promise<LiveEventRequestOutput> { 
+    await this.fsService.writeObject(event);
+    return {};
   }
 
   getUserEvent({ userId }: UserEventRequestInput): Promise<UserEventRequestOutput> {

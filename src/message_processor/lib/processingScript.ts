@@ -2,6 +2,7 @@ import { createReadStream, ReadStream } from "fs";
 import { readFile, writeFile } from "fs-extra";
 import { LiveEventRequestInput, EventName } from "@localmessageprocessor/interfaces";
 import { Sequelize } from "sequelize-typescript";
+import { lock, check } from "proper-lockfile";
 import "dotenv/config";
 import yargs from "yargs";
 
@@ -83,17 +84,34 @@ const forever = async (cb: () => Promise<void>) => {
     }
 }
 
+async function executeAfterResourceIsFree(cb: () => Promise<void>): Promise<void> {
+    while (!(await check(process.env.EVENTS_FILE))) {
+        try {
+            const releae = await lock(process.env.EVENTS_FILE);
+            const res = await cb();
+            await releae();
+            return res;
+        } catch (err) {
+            return executeAfterResourceIsFree(cb);
+        }
+    }
+}
+
 (async() => {
     const main = async () => {
         const eventsFilePath = process.env.EVENTS_FILE;
         const stream = createReadStream(eventsFilePath);
         const { events, charactersRead } = await processMessages(stream);
         const revenuesArray = await getRevenuesArray(events);
-        await Promise.all(revenuesArray.map(([userId, revenue]) => { 
-            sequelize.query(getUpsertQuery(userId, revenue));
-        }));
-        const fileContents = await readFile(eventsFilePath, { encoding: "utf-8" });
-        await writeFile(eventsFilePath, fileContents.substring(charactersRead), { encoding: "utf-8" });
+        // await Promise.all(revenuesArray.map(([userId, revenue]) => { 
+        //     sequelize.query(getUpsertQuery(userId, revenue));
+        // }));
+        await executeAfterResourceIsFree(() => {
+            return readFile(eventsFilePath, { encoding: "utf-8"})
+                .then((fileContents) => {
+                    return writeFile(eventsFilePath, fileContents.substring(charactersRead), { encoding: "utf-8" }).then(() => { console.log("Tick tack"); return sleep(5000) });
+                })
+            });
     }
     const args =  
     await yargs(process.argv)
