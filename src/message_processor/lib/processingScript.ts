@@ -1,13 +1,13 @@
-import { ReadStream } from "fs";
+import { ReadStream, createWriteStream } from "fs";
+import path from "path";
 import { readFile, writeFile } from "fs-extra";
 import { LiveEventRequestInput, EventName } from "@localmessageprocessor/interfaces";
 import { sleep } from "@localmessageprocessor/common";
+import api from "@localmessageprocessor/client";
 import { Sequelize } from "sequelize-typescript";
 import "dotenv/config";
 import yargs from "yargs";
 
-let counterQueries = 0;
-let counterMessages = 0;
 const SLEEP_MS = 500;
 
 const sequelize = new Sequelize({
@@ -23,21 +23,19 @@ const getUpsertQuery = (userId: string, revenue: number) => {
     return `INSERT INTO "public"."UsersRevenues" ("userId", "revenue", "createdAt", "updatedAt")
     VALUES ('${userId}', ${revenue}, NOW(), NOW())
     ON CONFLICT ("userId")
-    DO UPDATE SET revenue = excluded.revenue + (${revenue});`
+    DO UPDATE SET revenue = "UsersRevenues".revenue + excluded.revenue;`
 }
 
 export async function processMessages(contents: string ): Promise<{ events: LiveEventRequestInput[]; }> {
     const messagesQueue: LiveEventRequestInput[] = [];
     const data = contents.split("\n");
-    console.log("amount of messages", data.length);
     for (const dataChunk of data) {
         try {
             messagesQueue.push(JSON.parse(dataChunk));
         } catch (err) {
-            console.log("error with processing event", dataChunk ,err);
+            //do nothing
         }
     }
-    console.log("amount of events", messagesQueue.length);
     return { events: messagesQueue };
 }
 
@@ -65,27 +63,23 @@ const forever = async (cb: () => Promise<void>) => {
 }
 
 (async() => {
+    const client = api("http://localhost:8000", process.env.AUTH_SECRET);
     const main = async () => {
-        console.log("Locking FIle !");
-        await writeFile(process.env.LOCK_FILE, "1", { encoding: "utf-8" });
-        console.log("File is locked !");
+        await client.queueMode({ queueMode: true });
         const eventsFilePath = process.env.EVENTS_FILE;
         const eventsContent = await readFile(eventsFilePath, { encoding: "utf-8" });
         if (0 < eventsContent.length ) {
             const { events } = await processMessages(eventsContent);
             const revenuesArray = await getRevenuesArray(events);
-            counterQueries += revenuesArray.length;
-            counterMessages += events.length;
-            console.log("QUERIES PROCESSED: ", counterQueries);
-            console.log("EVENTS PROCESSED: ", counterMessages);
             await Promise.all(revenuesArray.map(([userId, revenue]) => { 
-                sequelize.query(getUpsertQuery(userId, revenue));
+                const sql = getUpsertQuery(userId, revenue);
+                //debugSqlStream.write(sql + "\n");
+                return sequelize.query(getUpsertQuery(userId, revenue));
             }));
             await writeFile(eventsFilePath,"", { encoding: "utf-8" });
         }
         
-        await writeFile(process.env.LOCK_FILE, "0", { encoding: "utf-8" });
-        console.log("File released !");
+        await client.queueMode({ queueMode: false });
     }
     const args =  
     await yargs(process.argv)

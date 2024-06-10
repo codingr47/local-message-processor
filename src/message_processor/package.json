@@ -22,7 +22,8 @@
     "@types/yargs": "^17.0.32",
     "@types/proper-lockfile": "^4.1.4",
     "@localmessageprocessor/interfaces": "^0.0.1",
-    "@localmessageprocessor/common": "^0.0.1"
+    "@localmessageprocessor/common": "^0.0.1",
+    "@localmessageprocessor/client": "^0.0.1"
   },
   "author": "Gil Reich",
   "license": "ISC"

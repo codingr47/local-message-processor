@@ -17,3 +17,9 @@ export interface UserEventRequestInput {
 export interface UserEventRequestOutput {
     revenue: number;
 };
+
+export interface QueueModeInput {
+    queueMode: boolean;
+};
+
+export interface QueueModeOutput {};

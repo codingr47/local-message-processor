@@ -7,8 +7,16 @@ import UsersRevenue from 'lib/entities/usersRevenue.entity';
 export class AppService {
   constructor(private fsService: FileSystemService, @Inject("USERS_REVENUE_REPOSITORY") private usersRevenueRepository: typeof UsersRevenue) {}
 
+  private messageProcessingMode = false; 
+
+  private queuedMessages: LiveEventRequestInput[] = [];
+
   async insertLiveEvent(event: LiveEventRequestInput): Promise<LiveEventRequestOutput> { 
-    await this.fsService.writeObject(event);
+    if (this.messageProcessingMode) {
+      this.queuedMessages.push(event);
+    } else {
+      await this.fsService.writeObject(event);
+    }
     return {};
   }
 
@@ -19,6 +27,16 @@ export class AppService {
         userId,
       }
     }).then(({ revenue }) => ({ revenue }));
+  } 
+
+  async setProcessingMode(isQueueMode: boolean) {
+    if (!isQueueMode && this.messageProcessingMode) {
+      this.messageProcessingMode = isQueueMode;
+      await Promise.all(this.queuedMessages.map((message) => this.insertLiveEvent(message)));
+      this.queuedMessages = [];
+    }
+    this.messageProcessingMode = isQueueMode;
+    
   } 
 
 }

@@ -21,8 +21,7 @@ describe("Load test", () => {
     it("Will make sure that all sent events reached the events file", async() => { 
         const EVENTS_PATH = path.resolve(__dirname, "../../../events.jsonl");
         const ERRORS_LOG_PATH = path.resolve(__dirname, "../../../errors.log");
-        const LOCKFILE_PATH = path.resolve(__dirname, "../../../lockfile");
-        [EVENTS_PATH, ERRORS_LOG_PATH, LOCKFILE_PATH].map((p) => exists(p).then( (doesExist) => { if (doesExist) { return unlink(p) } })); 
+        [EVENTS_PATH, ERRORS_LOG_PATH].map((p) => exists(p).then( (doesExist) => { if (doesExist) { return unlink(p) } })); 
         spawn("npm", ["run", "server:dev"], { cwd: path.resolve(__dirname, "../../"), stdio: "inherit", shell: true});
         const client = messagesApi("http://localhost:8000", "secret");
         const promises: Promise<any>[] = [];

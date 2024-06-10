@@ -3,6 +3,8 @@ import axiosRetry from "axios-retry";
 import { 
     LiveEventRequestInput,
     LiveEventRequestOutput,
+    QueueModeInput,
+    QueueModeOutput,
     UserEventRequestInput,
     UserEventRequestOutput,
 } from "@localmessageprocessor/interfaces";
@@ -11,6 +13,7 @@ import { AxiosResponse } from "axios";
 enum Routes {
     LiveEvent = "/liveEvent",
     UserEvents = "/userEvents/:userId",
+    QueueMode = "/queueMode",
 };
 
 export default function eventsApi(baseUrl: string, token: string) {   
@@ -30,6 +33,9 @@ export default function eventsApi(baseUrl: string, token: string) {
         userEvents(input: UserEventRequestInput): Promise<AxiosResponse<UserEventRequestOutput>> {
             const route = Routes.UserEvents.replace(":userId", input.userId);
             return client.get<UserEventRequestInput, AxiosResponse<UserEventRequestOutput>>(route);
+        },
+        queueMode(input: QueueModeInput): Promise<AxiosResponse<QueueModeOutput>> {
+            return client.post<QueueModeInput, AxiosResponse<QueueModeOutput>>(Routes.QueueMode, input);
         }
     }
 }
