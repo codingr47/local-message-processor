@@ -1,0 +1,2 @@
+export const UNAUTHORIZED_MESSAGE = "Unauthorized request";
+export const USERS_REVENUE_REPOSITORY = "USERS_REVENUE_REPOSITORY";

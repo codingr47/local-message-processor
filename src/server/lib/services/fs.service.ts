@@ -1,15 +1,13 @@
-import { WriteStream, createWriteStream, createReadStream, ReadStream } from "fs";
+import { WriteStream, createWriteStream } from "fs";
 import { Injectable, OnModuleInit } from "@nestjs/common";
 
-
-const WAIT_FOR_RESOURCE_MS = 50;
-
+/**
+ * a service class in charge of writing event objects into a file using a stream.
+ */
 @Injectable()
 export class FileSystemService implements OnModuleInit  {
 
-    private writeStream: WriteStream | undefined;
-
-
+    private writeStream: WriteStream | undefined
 
     onModuleInit() {    
         this.writeStream = createWriteStream(process.env.EVENTS_FILE, { flags: "a" });

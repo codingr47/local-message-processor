@@ -6,6 +6,7 @@ import { databaseProviders } from '../providers/database.providers';
 import { AuthorizerMiddleware } from '../middlewares/authorizer.middleware';
 import { FileSystemService } from 'lib/services/fs.service';
 import { usersRevenueProviders } from "../providers/usersRevenue.providers";
+import { Routes } from "../enums';
 
 @Module({
   imports: [],
@@ -17,7 +18,7 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthorizerMiddleware)
-      .forRoutes("/liveEvent", "/private/queueMode")
+      .forRoutes(Routes.LiveEvent, Routes.QueueMode)
   }
 
 }

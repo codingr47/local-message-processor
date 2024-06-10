@@ -5,14 +5,14 @@ import { Post } from '@nestjs/common';
 import { UserEventRequestOutput, LiveEventRequestOutput, QueueModeOutput } from "@localmessageprocessor/interfaces";
 import { CreateLiveEventRequest } from './dto/createLiveEventRequest';
 import { GetUserEventRequest } from './dto/getUserEventRequest';
-import { QueueModeRequest } from './dto/queueModeRequest';
+import { Routes } from '../enums';
 
-enum Routes {
-  LiveEvent = "/liveEvent",
-  UserEvents = "/userEvents/:userId",
-  QueueMode = "/queueMode",
-};
-
+/**
+ * This controller holds the public interface and type validation definitions
+ * of two routes
+ * POST /liveEvent - inserts a new live event
+ * GET /userEvents/:userId - gets the total revenue of a user, fetched by userId(string) 
+ */
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
@@ -27,12 +27,5 @@ export class AppController {
   @UsePipes(new ValidationPipe({ transform: true }))
   userEvent(@Param() params: GetUserEventRequest): Promise<UserEventRequestOutput> {
     return this.appService.getUserEvent(params)
-  }
-
-  @Post(Routes.QueueMode)
-  @UsePipes(new ValidationPipe({ transform: true }))
-  queueMode(@Body() event: QueueModeRequest): Promise<QueueModeOutput> {
-    this.appService.setProcessingMode(event.queueMode);
-    return Promise.resolve({});
   }
 }
