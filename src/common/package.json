@@ -21,6 +21,11 @@
       "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
       "test:e2e": "jest --config ./test/jest-e2e.json"
     },
+    "dependencies": {
+      "sequelize": "^6.37.3",
+      "sequelize-typescript": "^2.1.6",
+      "pg": "^8.12.0"
+    },
     "devDependencies": {
       "typescript": "^5.1.3",
       "ts-node": "^10.9.1"

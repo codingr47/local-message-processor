@@ -6,6 +6,7 @@ import messagesApi from "@localmessageprocessor/client";
 import { check as checkPort } from "tcp-port-used";
 import { unlink, exists } from "fs-extra";
 import { EventName } from "@localmessageprocessor/interfaces";
+import { getPostgresSequelize } from "@localmessageprocessor/common";
 
 jest.setTimeout(9999999)
 
@@ -19,7 +20,14 @@ const sleep = (ms: number) =>  {
 const NUMBER_OF_EVENTS_TO_SEND = 15000;
 describe("Load test", () => { 
     it("Will make sure that all users were properly updated in the db after process", async() => { 
-        const EVENTS_PATH = path.resolve(__dirname, "../../../events.jsonl");
+        const sequelize = getPostgresSequelize(
+            process.env.DB_HOST,
+            process.env.DB_USERNAME,
+            process.env.DB_PASSWORD,
+            process.env.DB_NAME
+        );
+        await sequelize.query(`DELETE FROM public."UsersRevenues"`);
+        const EVENTS_PATH = path.resolve(__dirname, process.env.EVENTS_FILE);
         const ERRORS_LOG_PATH = path.resolve(__dirname, "../../../errors.log");
         [EVENTS_PATH, ERRORS_LOG_PATH].map((p) => exists(p).then( (doesExist) => { if (doesExist) { return unlink(p) } })); 
         const childProcessServer = spawn("npm", ["run", "server:dev"], { cwd: path.resolve(__dirname, "../../"), stdio: "inherit", shell: true});
@@ -30,8 +38,8 @@ describe("Load test", () => {
             await sleep(50);
             portAvailable = await checkPort(8000, "0.0.0.0").catch(() => false);
         }
-        const childProcessMessageProcessor = spawn("npm", ["run", "process:dev-forever"], { cwd: path.resolve(__dirname, "../../"), stdio: "inherit", shell: true});
         await sleep(5000);
+        const childProcessMessageProcessor = spawn("npm", ["run", "process:dev-forever"], { cwd: path.resolve(__dirname, "../../"), stdio: "inherit", shell: true});
         console.log("Starting load test !");
        
         const errors: Error[] = [];

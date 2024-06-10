@@ -1,7 +1,6 @@
 import { readFile, writeFile } from "fs-extra";
-import { sleep } from "@localmessageprocessor/common";
+import { getPostgresSequelize, sleep } from "@localmessageprocessor/common";
 import api from "@localmessageprocessor/client";
-import { Sequelize } from "sequelize-typescript";
 import "dotenv/config";
 import yargs from "yargs";
 import { getEventsFromRawContent, getRevenuesArray, getUpsertQuery } from "./utils";
@@ -9,14 +8,12 @@ import { SLEEP_MS } from "./consts";
 
 
 
-const sequelize = new Sequelize({
-    dialect: "postgres",
-    host: process.env.DB_HOST,
-    port: 5432,
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-});
+const sequelize = getPostgresSequelize(
+    process.env.DB_HOST,
+    process.env.DB_USERNAME,
+    process.env.DB_PASSWORD,
+    process.env.DB_NAME
+);
 
 
 const forever = async (cb: () => Promise<void>) => {

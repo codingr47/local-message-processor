@@ -9,6 +9,7 @@
         "test:client-server-processor-parallel": "jest lib/client-server-send-processed-parallel.test.ts --verbose"
     },
     "devDependencies": {
+      "dotenv": "^16.4.5",
       "@types/jest": "^29.5.2",
       "@types/tcp-port-used": "^1.0.2",
       "ts-node": "^10.9.1",
@@ -20,7 +21,8 @@
       "throttled-queue": "^2.1.4",
       "@localmessageprocessor/server": "^0.0.1",
       "@localmessageprocessor/client": "^0.0.1",
-      "@localmessageprocessor/interfaces": "^0.0.1"
+      "@localmessageprocessor/interfaces": "^0.0.1",
+      "@localmessageprocessor/common": "^0.0.1"
     },
     "author": "Gil Reich",
     "license": "ISC"
