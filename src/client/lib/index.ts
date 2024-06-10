@@ -13,7 +13,7 @@ import { AxiosResponse } from "axios";
 enum Routes {
     LiveEvent = "/liveEvent",
     UserEvents = "/userEvents/:userId",
-    QueueMode = "/queueMode",
+    QueueMode = "/private/queueMode",
 };
 
 export default function eventsApi(baseUrl: string, token: string) {   
