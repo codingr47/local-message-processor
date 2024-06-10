@@ -10,7 +10,7 @@ The following is a monorepo, based on lerna containing 6 modules
 4. Open the command line at the root of the repo and run the command `npm run bootstrap`
 5. The .env file on the relative path `src\server\.env` needs to be set
 6. The .env file on the relative path `src\message_processor\.env` needs to be set
-
+7. The .env file on the relative path `src\tests\.env` needs to be set
 
 ### Setting the .env files
 
