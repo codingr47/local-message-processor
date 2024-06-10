@@ -34,14 +34,20 @@ EVENTS_FILE="<FULL_PATH_TO_EVENTS_FILE>"
 Open the command line at the root of the repo:
 
 Running the server: `npm run server:dev`
+
 Running the message processor script: `npm run process:dev`
+
 Runnig the message processor as a service (runs forever): `npm run process:dev-forever`
+
 
 ### Running the tests
 
 First test `npm run test:client-server`
+
 Second test: `npm run test:client-server-processor`
+
 Third test: `npm run test:client-server-processor-parallel`
+
 
 ## Packages
 ### Client
