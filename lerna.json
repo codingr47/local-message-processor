@@ -11,6 +11,7 @@
         "src/message_processor",
         "src/server",
         "src/interfaces",
+        "src/common",
         "src/tests"
     ]
 }

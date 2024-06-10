@@ -1,18 +1,14 @@
-import { createReadStream, ReadStream } from "fs";
+import { ReadStream } from "fs";
 import { readFile, writeFile } from "fs-extra";
 import { LiveEventRequestInput, EventName } from "@localmessageprocessor/interfaces";
+import { sleep } from "@localmessageprocessor/common";
 import { Sequelize } from "sequelize-typescript";
-import { lock, check } from "proper-lockfile";
 import "dotenv/config";
 import yargs from "yargs";
 
+let counterQueries = 0;
+let counterMessages = 0;
 const SLEEP_MS = 500;
-
-const sleep = (ms: number) =>  {
-    return new Promise<void>((res) => {
-        setTimeout(() => { res(); }, ms);
-    });
-}
 
 const sequelize = new Sequelize({
     dialect: "postgres",
@@ -30,35 +26,19 @@ const getUpsertQuery = (userId: string, revenue: number) => {
     DO UPDATE SET revenue = excluded.revenue + (${revenue});`
 }
 
-export async function processMessages(stream: ReadStream ): Promise<{ events: LiveEventRequestInput[ ]; charactersRead:number; }> {
-    let partialMessage = "";
-    let charactersRead = 0;
-    let messagesQueue: LiveEventRequestInput[] = [];
-    return new Promise((res) => { 
-        stream.setEncoding("utf-8")
-        .on("data", (chunk: string) => {
-            charactersRead += chunk.length; 
-            const data = chunk.split("\n");
-            for (const dataChunk of data) {
-                try {
-                    messagesQueue.push(JSON.parse(dataChunk));
-                } catch (err) {
-                    if (!partialMessage) {
-                        partialMessage = dataChunk;
-                    } else {
-                        partialMessage += dataChunk;
-                        messagesQueue.push(JSON.parse(partialMessage));
-                        partialMessage = "";
-                    }
-                }
-            }
-        })
-        .on("end", () => { 
-          res({ events: messagesQueue, charactersRead });  
-        })
-        
-    });
-   
+export async function processMessages(contents: string ): Promise<{ events: LiveEventRequestInput[]; }> {
+    const messagesQueue: LiveEventRequestInput[] = [];
+    const data = contents.split("\n");
+    console.log("amount of messages", data.length);
+    for (const dataChunk of data) {
+        try {
+            messagesQueue.push(JSON.parse(dataChunk));
+        } catch (err) {
+            console.log("error with processing event", dataChunk ,err);
+        }
+    }
+    console.log("amount of events", messagesQueue.length);
+    return { events: messagesQueue };
 }
 
 const getRevenuesArray = (messages: LiveEventRequestInput[]): [string, number][]=> { 
@@ -84,34 +64,28 @@ const forever = async (cb: () => Promise<void>) => {
     }
 }
 
-async function executeAfterResourceIsFree(cb: () => Promise<void>): Promise<void> {
-    while (!(await check(process.env.EVENTS_FILE))) {
-        try {
-            const releae = await lock(process.env.EVENTS_FILE);
-            const res = await cb();
-            await releae();
-            return res;
-        } catch (err) {
-            return executeAfterResourceIsFree(cb);
-        }
-    }
-}
-
 (async() => {
     const main = async () => {
+        console.log("Locking FIle !");
+        await writeFile(process.env.LOCK_FILE, "1", { encoding: "utf-8" });
+        console.log("File is locked !");
         const eventsFilePath = process.env.EVENTS_FILE;
-        const stream = createReadStream(eventsFilePath);
-        const { events, charactersRead } = await processMessages(stream);
-        const revenuesArray = await getRevenuesArray(events);
-        // await Promise.all(revenuesArray.map(([userId, revenue]) => { 
-        //     sequelize.query(getUpsertQuery(userId, revenue));
-        // }));
-        await executeAfterResourceIsFree(() => {
-            return readFile(eventsFilePath, { encoding: "utf-8"})
-                .then((fileContents) => {
-                    return writeFile(eventsFilePath, fileContents.substring(charactersRead), { encoding: "utf-8" }).then(() => { console.log("Tick tack"); return sleep(5000) });
-                })
-            });
+        const eventsContent = await readFile(eventsFilePath, { encoding: "utf-8" });
+        if (0 < eventsContent.length ) {
+            const { events } = await processMessages(eventsContent);
+            const revenuesArray = await getRevenuesArray(events);
+            counterQueries += revenuesArray.length;
+            counterMessages += events.length;
+            console.log("QUERIES PROCESSED: ", counterQueries);
+            console.log("EVENTS PROCESSED: ", counterMessages);
+            await Promise.all(revenuesArray.map(([userId, revenue]) => { 
+                sequelize.query(getUpsertQuery(userId, revenue));
+            }));
+            await writeFile(eventsFilePath,"", { encoding: "utf-8" });
+        }
+        
+        await writeFile(process.env.LOCK_FILE, "0", { encoding: "utf-8" });
+        console.log("File released !");
     }
     const args =  
     await yargs(process.argv)

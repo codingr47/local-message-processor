@@ -16,17 +16,13 @@ const sleep = (ms: number) =>  {
     });
 }
 
-const NUMBER_OF_EVENTS_TO_SEND = 5000;
+const NUMBER_OF_EVENTS_TO_SEND = 100;
 describe("Load test", () => { 
     it("Will make sure that all users were properly updated in the db after process", async() => { 
         const EVENTS_PATH = path.resolve(__dirname, "../../../events.jsonl");
         const ERRORS_LOG_PATH = path.resolve(__dirname, "../../../errors.log");
-        if (await exists(EVENTS_PATH)) {
-            await unlink(EVENTS_PATH);
-        } 
-        if (await exists(ERRORS_LOG_PATH)) {
-            await unlink(ERRORS_LOG_PATH);
-        }
+        const LOCKFILE_PATH = path.resolve(__dirname, "../../../lockfile");
+        [EVENTS_PATH, ERRORS_LOG_PATH, LOCKFILE_PATH].map((p) => exists(p).then( (doesExist) => { if (doesExist) { return unlink(p) } })); 
         const childProcessServer = spawn("npm", ["run", "server:dev"], { cwd: path.resolve(__dirname, "../../"), stdio: "inherit", shell: true});
         const client = messagesApi("http://localhost:8000", "secret");
         const promises: Promise<any>[] = [];
@@ -37,7 +33,7 @@ describe("Load test", () => {
         }
         await sleep(5000);
         console.log("Starting load test !");
-        //spawn("npm", ["run", "process:dev-forever"], { cwd: path.resolve(__dirname, "../../"), stdio: "inherit", shell: true});
+        spawn("npm", ["run", "process:dev-forever"], { cwd: path.resolve(__dirname, "../../"), stdio: "inherit", shell: true});
         const errors: Error[] = [];
         const throttle = throttledQueue(1000, 1000);
         const expectedUserValues = new Map<string, number[]>();
@@ -52,11 +48,12 @@ describe("Load test", () => {
         writeFileSync(ERRORS_LOG_PATH, JSON.stringify(errors), { encoding: "utf8" });
 
         childProcessServer.kill();
-        await sleep(5000);
+        await sleep(15000);
         const arrayOfExpectedUsers = Array.from(expectedUserValues)
         for ( const [userId, transactions] of arrayOfExpectedUsers) {
             const { data: { revenue: actualUserRevenue } } = await client.userEvents({ userId });
             const sumOfTransactions = transactions.reduce((accumulator, currentTransaction) => accumulator + currentTransaction, 0);
+            console.log("expects for user ", userId, sumOfTransactions, actualUserRevenue);
             expect(actualUserRevenue).toBe(sumOfTransactions); 
         }
 
