@@ -16,7 +16,7 @@ const sleep = (ms: number) =>  {
     });
 }
 
-const NUMBER_OF_EVENTS_TO_SEND = 2000;
+const NUMBER_OF_EVENTS_TO_SEND = 5000;
 describe("Load test", () => { 
     it("Will make sure that all users were properly updated in the db after process", async() => { 
         const EVENTS_PATH = path.resolve(__dirname, "../../../events.jsonl");
